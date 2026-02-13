@@ -45,51 +45,42 @@ if uploaded_file:
     st.success("✅ Analysis Completed Successfully!")
 
     if st.button("🔎 Get Job Recommendation"):
-        with st.spinner("Fetching Job Recommendation."):
-            key_words = ask_groq(f"Based on this resume summary, Suggest 3 specific job titles for this resume. Return ONLY the titles separated by commas, no numbers or bullets.\n\n Summary: {summary}", max_tokens=50)
-            search_query = [k.strip() for k in key_words.split(",")]
+        with st.spinner("Generating Search Keywords..."):
+            key_words = ask_groq(f"Based on this resume summary, suggest 3 specific job titles. Return ONLY the titles separated by commas.\n\n Summary: {summary}", max_tokens=50)
+            keyword_list = [k.strip() for k in key_words.split(",")]
 
-        st.success(f"Searching for: {search_query}")
+        st.success(f"Keywords identified: {', '.join(keyword_list)}")
 
-        with st.spinner("Fetching Jobs from Linkdin and Naukri"):
-            all_jobs = []
-            for keyword in search_query:
-                st.write(f"Searching for {keyword}...")
-                results = fetch_linkdin_jobs(keyword, row=10)
-                linkdin_jobs = fetch_linkdin_jobs(search_query, row=60)
-                naukri_jobs = fetch_naukri_jobs(search_query, row=60)
+        all_linkedin = []
+        all_naukri = []
+
+        for keyword in keyword_list:
+            with st.spinner(f"Searching for {keyword}..."):
+                # 1. LinkedIn (supports 10)
+                l_jobs = fetch_linkdin_jobs(keyword, row=10) 
+                all_linkedin.extend(l_jobs)
+                
+                # 2. Naukri (MUST be >= 50)
+                n_jobs = fetch_naukri_jobs(keyword, row=50) # Changed from 10 to 50
+                all_naukri.extend(n_jobs)
+
 
         st.markdown("---")
-        st.header("Top Linkdin Jobs")
+        st.header("Top LinkedIn Jobs")
+        if all_linkedin:
+            for job in all_linkedin:
+                # This covers almost every variation used by LinkedIn scrapers
+                title = (job.get('Job Title') or job.get('title') or 
+                        job.get('jobTitle') or job.get('positionName') or "Untitled Role")
+                
+                company = (job.get('Company Name') or job.get('company') or 
+                        job.get('companyName') or job.get('name') or "Unknown Company")
+                
+                link = (job.get('Job Url') or job.get('url') or 
+                        job.get('link') or job.get('job_url') or "#")
 
-        if linkdin_jobs:
-            for job in linkdin_jobs:
-                title = job.get('Job Title') or job.get('title') or "Untitled Role"
-                company = job.get('Company Name') or job.get('company') or "Unknown Company"
-                location = job.get('Job Location') or job.get('location') or "India"
-                link = job.get('Job Url') or job.get('url') or job.get('link')
-
-                st.markdown(f"### **{title}**")
-                st.markdown(f"🏢 *{company}*")
-                st.markdown(f"📍 {location}")
-                if link:
-                    st.markdown(f"🔗 [Apply on LinkedIn]({link})")
+                st.write(f"### **{title}**")
+                st.write(f"🏢 *{company}*")
+                if link != "#":
+                    st.write(f"🔗 [Apply Here]({link})")
                 st.markdown("---")
-        else:
-            st.warning("No Linkdin jobs found")
-
-        if naukri_jobs:
-            for job in naukri_jobs:
-                title = job.get('title') or job.get('jobTitle') or "No Title"
-                company = job.get('companyName') or job.get('company') or "Unknown Company"
-                location = job.get('location') or job.get('jobLocation') or "No Location"
-                link = job.get('link') or job.get('jobUrl') or job.get('url') or "#"
-
-                st.markdown(f"### **{title}**")
-                st.markdown(f"🏢 *{company}*")
-                st.markdown(f"📍 {location}")
-                st.markdown(f"🔗 [View Job Details]({link})")
-                st.markdown("---")
-        else:
-            st.warning("No Naukri Jobs found")
-

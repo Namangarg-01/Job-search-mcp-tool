@@ -27,9 +27,10 @@ def fetch_linkdin_jobs(search_query, location = "india", row = 60): # rows is th
 
 #Fetch Nauki Jobs 
 def fetch_naukri_jobs(search_query, location = "india", row = 60):
+    safe_row = max(row, 50)
     run_input = {
         "keyword":search_query,
-        "maxJobs": row,
+        "maxJobs": safe_row,
         "freshness": "all",
         "sortBy": "relevance",
         "experience": "all",
