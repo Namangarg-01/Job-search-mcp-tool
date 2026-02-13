@@ -82,4 +82,4 @@ if uploaded_file:
                 st.write(f"🏢 *{company}*")
                 if link != "#":
                     st.write(f"🔗 [Apply Here]({link})")
-                st.markdown("---")
+                st.markdown("----")
