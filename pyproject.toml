@@ -4,4 +4,11 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "apify-client>=2.4.1",
+    "groq>=1.0.0",
+    "openai>=2.20.0",
+    "pymupdf>=1.27.1",
+    "python-dotenv>=1.2.1",
+    "streamlit>=1.54.0",
+]
