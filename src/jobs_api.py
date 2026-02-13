@@ -19,7 +19,9 @@ def fetch_linkdin_jobs(search_query, location = "india", row = 60): # rows is th
             "apifyProxyGroups": ["RESIDENTIAL"],
         }
     }
-    run = apify_client.actor("BHzefUZlZRKWxkTck").call(run_input=run_input)
+    # Change the ID inside the .actor() method
+    run = apify_client.actor("worldunboxer/rapid-linkedin-scraper").call(run_input=run_input)
+    # run = apify_client.actor("BHzefUZlZRKWxkTck").call(run_input=run_input)
     jobs = list(apify_client.dataset(run["defaultDatasetId"]).iterate_items()) #Returning list of Jobs
     return jobs
 
@@ -27,7 +29,7 @@ def fetch_linkdin_jobs(search_query, location = "india", row = 60): # rows is th
 def fetch_naukri_jobs(search_query, location = "india", row = 60):
     run_input = {
         "keyword":search_query,
-        "maxJobs": 60,
+        "maxJobs": row,
         "freshness": "all",
         "sortBy": "relevance",
         "experience": "all",
