@@ -69,7 +69,6 @@ if uploaded_file:
         st.header("Top LinkedIn Jobs")
         if all_linkedin:
             for job in all_linkedin:
-                # This covers almost every variation used by LinkedIn scrapers
                 title = (job.get('Job Title') or job.get('title') or 
                         job.get('jobTitle') or job.get('positionName') or "Untitled Role")
                 

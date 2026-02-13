@@ -10,6 +10,7 @@ apify_client = ApifyClient(os.getenv("APIFY_API_KEY"))
 
 #Fetch Linkdin Jobs based on search query and the location
 def fetch_linkdin_jobs(search_query, location = "india", row = 60): # rows is the number of jobs you want to see 
+    search_query = f'"{search_query}"' #This prevents LinkedIn from showing "Related" (unrelated) garbage
     run_input = {
         "title" : search_query,
         "location" : location,
@@ -19,10 +20,8 @@ def fetch_linkdin_jobs(search_query, location = "india", row = 60): # rows is th
             "apifyProxyGroups": ["RESIDENTIAL"],
         }
     }
-    # Change the ID inside the .actor() method
-    run = apify_client.actor("worldunboxer/rapid-linkedin-scraper").call(run_input=run_input)
-    # run = apify_client.actor("BHzefUZlZRKWxkTck").call(run_input=run_input)
-    jobs = list(apify_client.dataset(run["defaultDatasetId"]).iterate_items()) #Returning list of Jobs
+    run = apify_client.actor("worldunboxer/rapid-linkedin-scraper").call(run_input=run_input, timeout_secs=120)
+    jobs = list(apify_client.dataset(run["defaultDatasetId"]).iterate_items())
     return jobs
 
 #Fetch Nauki Jobs 
